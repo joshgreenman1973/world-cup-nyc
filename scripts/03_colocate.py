@@ -13,6 +13,7 @@ No API key required.
 import csv
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -30,6 +31,32 @@ OUT = ROOT / "data" / "raw" / "teams_pre.json"
 COVERAGE_TARGET = 0.60   # densest set covers >= this share of the diaspora
 MAX_PUMAS = 8
 MIN_PUMAS = 1
+
+
+def smart_title(s):
+    """Title-case DOHMH names (usually ALL CAPS) without mangling apostrophes or
+    name prefixes: 'BEKY'S' -> "Beky's", "O'BRIEN" -> "O'Brien", 'MCNALLY' ->
+    'McNally', '55 DELI-COFFEE SHOP' -> '55 Deli-Coffee Shop'."""
+    s = re.sub(r"\s+", " ", (s or "").strip())
+    if not s:
+        return s
+
+    def cap(w):
+        lw = w.lower()
+        if not lw:
+            return lw
+        chars = list(lw[0].upper() + lw[1:])
+        for i in range(2, len(chars)):
+            # capitalize after an apostrophe only for 1-letter prefixes (O', D', L')
+            if chars[i - 1] == "'" and chars[i - 2].isalpha() and (i - 2 == 0 or not chars[i - 3].isalpha()):
+                chars[i] = chars[i].upper()
+        r = "".join(chars)
+        if r[:2].lower() == "mc" and len(r) > 2 and r[2].isalpha():
+            r = r[:2] + r[2].upper() + r[3:]
+        return r
+
+    parts = re.split(r"([ \-/])", s)
+    return "".join(cap(p) if p not in (" ", "-", "/") else p for p in parts)
 
 
 def reliab_class(est, moe):
@@ -75,7 +102,7 @@ def main():
             n_located += 1
             venues.append({
                 "camis": row["camis"],
-                "dba": (row.get("dba") or "").strip().title(),
+                "dba": smart_title(row.get("dba")),
                 "lat": round(lat, 6), "lon": round(lon, 6),
                 "puma": puma,
                 "cuisine": row.get("cuisine_description", ""),
