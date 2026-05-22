@@ -61,7 +61,9 @@ For each nation we rank the 55 PUMAs by that nation's resident count, then take 
 
 ### Why there are no ratings or prices
 
-The spots are **not quality-ranked.** We wanted to surface well-rated, affordable places, but every source that carries restaurant ratings and price (Yelp, Google, Foursquare, Tripadvisor) gates that data behind a paid and/or keyed API, and their terms of service prohibit re-hosting or caching that content into a static map like this one. The free, terms-compliant alternatives (OpenStreetMap) carry locations and cuisine but no ratings. Rather than scrape (which violates those terms) or pay, we show the cuisine-matched spots **unranked** — accurate about what we can and can't measure. If a free, compliant ratings source becomes available, it can be layered in later.
+The spots are **not quality-ranked.** We wanted to surface well-rated, affordable places, but every source that carries restaurant ratings and price (Yelp, Google, Foursquare, Tripadvisor) gates that data behind a paid and/or keyed API, and their terms of service prohibit re-hosting or caching that content into a static map like this one. The free, terms-compliant alternatives (OpenStreetMap) carry locations and cuisine but no ratings. Rather than scrape (which violates those terms) or pay, we show the cuisine-matched spots **unranked** — accurate about what we can and can't measure.
+
+Instead, **every spot links out to Google Maps** ("See reviews on Google Maps"). That's a plain search deep-link — no API, no key, nothing stored on our side — so you get Google's live ratings and reviews on Google's own page to judge a place, fully within their terms. If a free, compliant ratings source ever becomes available, it can be layered in directly.
 
 ## Limitations, in brief
 
