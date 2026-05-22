@@ -1,0 +1,61 @@
+{
+  "tournament": "FIFA World Cup 2026",
+  "updated": "2026-05-22",
+  "_README": "PROVISIONAL 48-team field. Hosts are certain; the rest reflects a best-effort snapshot and MUST be verified against final qualification. To resolve a TBD slot: set nation + code (matching a key in nation_mapping.json) + qualified:true, then re-run scripts 03-05. Codes here must match keys in nation_mapping.json.",
+  "teams": [
+    { "code": "USA", "nation": "United States", "confederation": "CONCACAF", "flag": "🇺🇸", "qualified": true, "host": true },
+    { "code": "CAN", "nation": "Canada", "confederation": "CONCACAF", "flag": "🇨🇦", "qualified": true, "host": true },
+    { "code": "MEX", "nation": "Mexico", "confederation": "CONCACAF", "flag": "🇲🇽", "qualified": true, "host": true },
+    { "code": "PAN", "nation": "Panama", "confederation": "CONCACAF", "flag": "🇵🇦", "qualified": true },
+    { "code": "CRC", "nation": "Costa Rica", "confederation": "CONCACAF", "flag": "🇨🇷", "qualified": true },
+    { "code": "JAM", "nation": "Jamaica", "confederation": "CONCACAF", "flag": "🇯🇲", "qualified": true },
+
+    { "code": "ARG", "nation": "Argentina", "confederation": "CONMEBOL", "flag": "🇦🇷", "qualified": true },
+    { "code": "BRA", "nation": "Brazil", "confederation": "CONMEBOL", "flag": "🇧🇷", "qualified": true },
+    { "code": "URU", "nation": "Uruguay", "confederation": "CONMEBOL", "flag": "🇺🇾", "qualified": true },
+    { "code": "COL", "nation": "Colombia", "confederation": "CONMEBOL", "flag": "🇨🇴", "qualified": true },
+    { "code": "ECU", "nation": "Ecuador", "confederation": "CONMEBOL", "flag": "🇪🇨", "qualified": true },
+    { "code": "PAR", "nation": "Paraguay", "confederation": "CONMEBOL", "flag": "🇵🇾", "qualified": true },
+
+    { "code": "FRA", "nation": "France", "confederation": "UEFA", "flag": "🇫🇷", "qualified": true },
+    { "code": "ENG", "nation": "England", "confederation": "UEFA", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "qualified": true },
+    { "code": "ESP", "nation": "Spain", "confederation": "UEFA", "flag": "🇪🇸", "qualified": true },
+    { "code": "POR", "nation": "Portugal", "confederation": "UEFA", "flag": "🇵🇹", "qualified": true },
+    { "code": "GER", "nation": "Germany", "confederation": "UEFA", "flag": "🇩🇪", "qualified": true },
+    { "code": "ITA", "nation": "Italy", "confederation": "UEFA", "flag": "🇮🇹", "qualified": true },
+    { "code": "NED", "nation": "Netherlands", "confederation": "UEFA", "flag": "🇳🇱", "qualified": true },
+    { "code": "BEL", "nation": "Belgium", "confederation": "UEFA", "flag": "🇧🇪", "qualified": true },
+    { "code": "CRO", "nation": "Croatia", "confederation": "UEFA", "flag": "🇭🇷", "qualified": true },
+    { "code": "SUI", "nation": "Switzerland", "confederation": "UEFA", "flag": "🇨🇭", "qualified": true },
+    { "code": "DEN", "nation": "Denmark", "confederation": "UEFA", "flag": "🇩🇰", "qualified": true },
+    { "code": "AUT", "nation": "Austria", "confederation": "UEFA", "flag": "🇦🇹", "qualified": true },
+    { "code": "POL", "nation": "Poland", "confederation": "UEFA", "flag": "🇵🇱", "qualified": true },
+    { "code": "SRB", "nation": "Serbia", "confederation": "UEFA", "flag": "🇷🇸", "qualified": true },
+    { "code": "TUR", "nation": "Turkey", "confederation": "UEFA", "flag": "🇹🇷", "qualified": true },
+    { "code": "NOR", "nation": "Norway", "confederation": "UEFA", "flag": "🇳🇴", "qualified": true },
+
+    { "code": "MAR", "nation": "Morocco", "confederation": "CAF", "flag": "🇲🇦", "qualified": true },
+    { "code": "SEN", "nation": "Senegal", "confederation": "CAF", "flag": "🇸🇳", "qualified": true },
+    { "code": "EGY", "nation": "Egypt", "confederation": "CAF", "flag": "🇪🇬", "qualified": true },
+    { "code": "ALG", "nation": "Algeria", "confederation": "CAF", "flag": "🇩🇿", "qualified": true },
+    { "code": "NGA", "nation": "Nigeria", "confederation": "CAF", "flag": "🇳🇬", "qualified": true },
+    { "code": "CIV", "nation": "Ivory Coast", "confederation": "CAF", "flag": "🇨🇮", "qualified": true },
+    { "code": "CMR", "nation": "Cameroon", "confederation": "CAF", "flag": "🇨🇲", "qualified": true },
+    { "code": "GHA", "nation": "Ghana", "confederation": "CAF", "flag": "🇬🇭", "qualified": true },
+    { "code": "TUN", "nation": "Tunisia", "confederation": "CAF", "flag": "🇹🇳", "qualified": true },
+
+    { "code": "JPN", "nation": "Japan", "confederation": "AFC", "flag": "🇯🇵", "qualified": true },
+    { "code": "KOR", "nation": "South Korea", "confederation": "AFC", "flag": "🇰🇷", "qualified": true },
+    { "code": "IRN", "nation": "Iran", "confederation": "AFC", "flag": "🇮🇷", "qualified": true },
+    { "code": "AUS", "nation": "Australia", "confederation": "AFC", "flag": "🇦🇺", "qualified": true },
+    { "code": "KSA", "nation": "Saudi Arabia", "confederation": "AFC", "flag": "🇸🇦", "qualified": true },
+    { "code": "QAT", "nation": "Qatar", "confederation": "AFC", "flag": "🇶🇦", "qualified": true },
+    { "code": "IRQ", "nation": "Iraq", "confederation": "AFC", "flag": "🇮🇶", "qualified": true },
+    { "code": "UZB", "nation": "Uzbekistan", "confederation": "AFC", "flag": "🇺🇿", "qualified": true },
+
+    { "code": "NZL", "nation": "New Zealand", "confederation": "OFC", "flag": "🇳🇿", "qualified": true },
+
+    { "code": "TBD-PO-1", "nation": null, "confederation": "Playoff", "flag": "🏳️", "qualified": false, "note": "Inter-confederation playoff winner" },
+    { "code": "TBD-PO-2", "nation": null, "confederation": "Playoff", "flag": "🏳️", "qualified": false, "note": "Inter-confederation playoff winner" }
+  ]
+}

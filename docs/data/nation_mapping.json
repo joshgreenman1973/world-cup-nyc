@@ -1,0 +1,645 @@
+{
+  "_README": "Maps each nation to ACS table B05006 place-of-birth code(s) and NYC DOHMH cuisine_description value(s). b05006 codes are ESTIMATE codes (suffix E); the bake derives the matching MOE code by swapping E->M. cuisines must be EXACT strings from dataset 43nn-pn8j (the bake validates and warns on any zero-match string). Empty b05006 = no clean ACS country detail (the nation falls in an 'Other' regional bucket); such teams render as data_quality 'limited'. Edit freely; re-run scripts 03-05 after changes.",
+  "ARG": {
+    "nation": "Argentina",
+    "b05006": [
+      "B05006_165E"
+    ],
+    "cuisines": [
+      "Latin American",
+      "Chimichurri",
+      "Steakhouse"
+    ],
+    "notes": "No 'Argentine' DOHMH tag; Latin American is the closest bucket. Steakhouse/Chimichurri added since Argentine asado spots often file under those. Co-location to Argentine neighborhoods sharpens the result."
+  },
+  "BRA": {
+    "nation": "Brazil",
+    "b05006": [
+      "B05006_167E"
+    ],
+    "cuisines": [
+      "Brazilian"
+    ],
+    "notes": ""
+  },
+  "URU": {
+    "nation": "Uruguay",
+    "b05006": [
+      "B05006_173E"
+    ],
+    "cuisines": [
+      "Latin American",
+      "Chimichurri"
+    ],
+    "notes": "No 'Uruguayan' DOHMH tag; shares the Latin American / parrilla bucket with Argentina."
+  },
+  "COL": {
+    "nation": "Colombia",
+    "b05006": [
+      "B05006_169E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": "No 'Colombian' DOHMH tag; Latin American bucket. Co-location to Colombian enclaves (Jackson Heights) does the work."
+  },
+  "ECU": {
+    "nation": "Ecuador",
+    "b05006": [
+      "B05006_170E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": "No 'Ecuadorian' DOHMH tag; Latin American bucket."
+  },
+  "PER": {
+    "nation": "Peru",
+    "b05006": [
+      "B05006_172E"
+    ],
+    "cuisines": [
+      "Peruvian"
+    ],
+    "notes": ""
+  },
+  "CHI": {
+    "nation": "Chile",
+    "b05006": [
+      "B05006_168E"
+    ],
+    "cuisines": [
+      "Chilean",
+      "Latin American"
+    ],
+    "notes": ""
+  },
+  "PAR": {
+    "nation": "Paraguay",
+    "b05006": [],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": "ACS does not break out Paraguay (folded into 'Other South America'), so no diaspora layer; flagged limited. Tiny NYC community."
+  },
+  "VEN": {
+    "nation": "Venezuela",
+    "b05006": [
+      "B05006_174E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": "No 'Venezuelan' DOHMH tag; Latin American / arepa spots."
+  },
+  "BOL": {
+    "nation": "Bolivia",
+    "b05006": [
+      "B05006_166E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": ""
+  },
+  "USA": {
+    "nation": "United States",
+    "b05006": [],
+    "cuisines": [
+      "American"
+    ],
+    "host": true,
+    "notes": "Host and home team. 'Diaspora density' is meaningless for the home country, so no choropleth; we still surface American/sports-bar style spots citywide. Flagged host."
+  },
+  "CAN": {
+    "nation": "Canada",
+    "b05006": [
+      "B05006_177E"
+    ],
+    "cuisines": [],
+    "notes": "Co-host. Canadian-born New Yorkers are dispersed and there is no distinct Canadian cuisine in DOHMH, so the restaurant layer is empty."
+  },
+  "MEX": {
+    "nation": "Mexico",
+    "b05006": [
+      "B05006_160E"
+    ],
+    "cuisines": [
+      "Mexican",
+      "Tex-Mex"
+    ],
+    "notes": "Co-host with a large, well-mapped diaspora and a clean cuisine tag."
+  },
+  "CRC": {
+    "nation": "Costa Rica",
+    "b05006": [
+      "B05006_156E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": ""
+  },
+  "PAN": {
+    "nation": "Panama",
+    "b05006": [
+      "B05006_162E"
+    ],
+    "cuisines": [
+      "Latin American",
+      "Caribbean"
+    ],
+    "notes": ""
+  },
+  "HON": {
+    "nation": "Honduras",
+    "b05006": [
+      "B05006_159E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": ""
+  },
+  "JAM": {
+    "nation": "Jamaica",
+    "b05006": [
+      "B05006_148E"
+    ],
+    "cuisines": [
+      "Caribbean"
+    ],
+    "notes": "Caribbean bucket; co-location to Jamaican enclaves (East Flatbush, Bronx) sharpens it."
+  },
+  "GUA": {
+    "nation": "Guatemala",
+    "b05006": [
+      "B05006_158E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": ""
+  },
+  "SLV": {
+    "nation": "El Salvador",
+    "b05006": [
+      "B05006_157E"
+    ],
+    "cuisines": [
+      "Latin American"
+    ],
+    "notes": ""
+  },
+  "FRA": {
+    "nation": "France",
+    "b05006": [
+      "B05006_016E"
+    ],
+    "cuisines": [
+      "French",
+      "New French"
+    ],
+    "notes": ""
+  },
+  "ENG": {
+    "nation": "England",
+    "b05006": [
+      "B05006_010E"
+    ],
+    "cuisines": [
+      "English"
+    ],
+    "notes": "ACS reports England separately (code 010). 'English' is a thin DOHMH tag (~125 spots); English-style pubs may file as bars without food service and be under-represented."
+  },
+  "SCO": {
+    "nation": "Scotland",
+    "b05006": [
+      "B05006_011E"
+    ],
+    "cuisines": [
+      "English"
+    ],
+    "notes": "ACS reports Scotland separately (code 011). No 'Scottish' cuisine tag; English/pub bucket."
+  },
+  "WAL": {
+    "nation": "Wales",
+    "b05006": [
+      "B05006_009E"
+    ],
+    "cuisines": [
+      "English"
+    ],
+    "notes": "ACS folds Wales into 'United Kingdom excluding England and Scotland' (code 009, also includes Northern Ireland), so the diaspora figure is not Wales-specific; flagged in notes."
+  },
+  "ESP": {
+    "nation": "Spain",
+    "b05006": [
+      "B05006_026E"
+    ],
+    "cuisines": [
+      "Spanish",
+      "Tapas"
+    ],
+    "notes": "CAUTION: in NYC the DOHMH 'Spanish' tag overwhelmingly means Caribbean/Latino Spanish-speaking food, NOT food from Spain. 'Tapas' is the more Spain-specific tag. Co-location to the (small) Spain-born population helps but this pairing is weak."
+  },
+  "POR": {
+    "nation": "Portugal",
+    "b05006": [
+      "B05006_024E"
+    ],
+    "cuisines": [
+      "Portuguese"
+    ],
+    "notes": ""
+  },
+  "GER": {
+    "nation": "Germany",
+    "b05006": [
+      "B05006_017E"
+    ],
+    "cuisines": [
+      "German"
+    ],
+    "notes": ""
+  },
+  "NED": {
+    "nation": "Netherlands",
+    "b05006": [
+      "B05006_018E"
+    ],
+    "cuisines": [],
+    "notes": "No distinct Dutch cuisine tag in DOHMH; restaurant layer limited."
+  },
+  "BEL": {
+    "nation": "Belgium",
+    "b05006": [
+      "B05006_015E"
+    ],
+    "cuisines": [],
+    "notes": "No distinct Belgian cuisine tag; restaurant layer limited."
+  },
+  "ITA": {
+    "nation": "Italy",
+    "b05006": [
+      "B05006_023E"
+    ],
+    "cuisines": [
+      "Italian"
+    ],
+    "notes": "Italian is huge in NYC; co-location to Italian-born enclaves (Bensonhurst, Morris Park) is what makes this specific rather than citywide."
+  },
+  "CRO": {
+    "nation": "Croatia",
+    "b05006": [
+      "B05006_033E"
+    ],
+    "cuisines": [
+      "Eastern European"
+    ],
+    "notes": "No 'Croatian' tag; Eastern European bucket, weak."
+  },
+  "SUI": {
+    "nation": "Switzerland",
+    "b05006": [
+      "B05006_019E"
+    ],
+    "cuisines": [],
+    "notes": "No distinct Swiss cuisine tag; restaurant layer limited."
+  },
+  "AUT": {
+    "nation": "Austria",
+    "b05006": [
+      "B05006_014E"
+    ],
+    "cuisines": [
+      "German"
+    ],
+    "notes": "No 'Austrian' tag; German bucket, weak."
+  },
+  "DEN": {
+    "nation": "Denmark",
+    "b05006": [
+      "B05006_004E"
+    ],
+    "cuisines": [
+      "Scandinavian"
+    ],
+    "notes": "Shared Scandinavian bucket with Norway/Sweden."
+  },
+  "NOR": {
+    "nation": "Norway",
+    "b05006": [
+      "B05006_006E"
+    ],
+    "cuisines": [
+      "Scandinavian"
+    ],
+    "notes": "Shared Scandinavian bucket."
+  },
+  "SWE": {
+    "nation": "Sweden",
+    "b05006": [
+      "B05006_007E"
+    ],
+    "cuisines": [
+      "Scandinavian"
+    ],
+    "notes": "Shared Scandinavian bucket."
+  },
+  "POL": {
+    "nation": "Poland",
+    "b05006": [
+      "B05006_040E"
+    ],
+    "cuisines": [
+      "Polish",
+      "Eastern European"
+    ],
+    "notes": "Co-location to Greenpoint sharpens the Polish result."
+  },
+  "SRB": {
+    "nation": "Serbia",
+    "b05006": [
+      "B05006_043E"
+    ],
+    "cuisines": [
+      "Eastern European"
+    ],
+    "notes": "No 'Serbian' tag; Eastern European bucket."
+  },
+  "TUR": {
+    "nation": "Turkey",
+    "b05006": [
+      "B05006_090E"
+    ],
+    "cuisines": [
+      "Turkish",
+      "Mediterranean"
+    ],
+    "notes": ""
+  },
+  "UKR": {
+    "nation": "Ukraine",
+    "b05006": [
+      "B05006_044E"
+    ],
+    "cuisines": [
+      "Eastern European",
+      "Russian"
+    ],
+    "notes": "No 'Ukrainian' tag; Eastern European bucket (East Village, Brighton Beach). 'Russian' added as a culinary-overlap proxy with a caveat."
+  },
+  "GRE": {
+    "nation": "Greece",
+    "b05006": [
+      "B05006_022E"
+    ],
+    "cuisines": [
+      "Greek"
+    ],
+    "notes": "Co-location to Astoria sharpens this strongly."
+  },
+  "ROU": {
+    "nation": "Romania",
+    "b05006": [
+      "B05006_041E"
+    ],
+    "cuisines": [
+      "Eastern European"
+    ],
+    "notes": ""
+  },
+  "JPN": {
+    "nation": "Japan",
+    "b05006": [
+      "B05006_053E"
+    ],
+    "cuisines": [
+      "Japanese"
+    ],
+    "notes": ""
+  },
+  "KOR": {
+    "nation": "South Korea",
+    "b05006": [
+      "B05006_054E"
+    ],
+    "cuisines": [
+      "Korean"
+    ],
+    "notes": "ACS does not split North/South Korea; in practice nearly all Korea-born New Yorkers are from South Korea. Co-location to Koreatown / Flushing."
+  },
+  "IRN": {
+    "nation": "Iran",
+    "b05006": [
+      "B05006_061E"
+    ],
+    "cuisines": [
+      "Iranian",
+      "Middle Eastern"
+    ],
+    "notes": ""
+  },
+  "AUS": {
+    "nation": "Australia",
+    "b05006": [
+      "B05006_132E"
+    ],
+    "cuisines": [
+      "Australian"
+    ],
+    "notes": ""
+  },
+  "KSA": {
+    "nation": "Saudi Arabia",
+    "b05006": [
+      "B05006_088E"
+    ],
+    "cuisines": [
+      "Middle Eastern"
+    ],
+    "notes": "No 'Saudi' tag; broad Middle Eastern bucket, weak."
+  },
+  "QAT": {
+    "nation": "Qatar",
+    "b05006": [],
+    "cuisines": [
+      "Middle Eastern"
+    ],
+    "notes": "ACS folds Qatar into 'Other Western Asia'; no diaspora layer, flagged limited. Tiny NYC community."
+  },
+  "IRQ": {
+    "nation": "Iraq",
+    "b05006": [
+      "B05006_083E"
+    ],
+    "cuisines": [
+      "Middle Eastern"
+    ],
+    "notes": ""
+  },
+  "UAE": {
+    "nation": "United Arab Emirates",
+    "b05006": [
+      "B05006_091E"
+    ],
+    "cuisines": [
+      "Middle Eastern"
+    ],
+    "notes": ""
+  },
+  "JOR": {
+    "nation": "Jordan",
+    "b05006": [
+      "B05006_085E"
+    ],
+    "cuisines": [
+      "Middle Eastern"
+    ],
+    "notes": ""
+  },
+  "UZB": {
+    "nation": "Uzbekistan",
+    "b05006": [
+      "B05006_066E"
+    ],
+    "cuisines": [
+      "Eastern European",
+      "Middle Eastern"
+    ],
+    "notes": "No 'Uzbek' tag; Bukharian/Central Asian food in Rego Park/Forest Hills often files as Eastern European or Middle Eastern. Co-location helps."
+  },
+  "MAR": {
+    "nation": "Morocco",
+    "b05006": [
+      "B05006_113E"
+    ],
+    "cuisines": [
+      "Moroccan",
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "notes": "'Moroccan' is a thin tag (~149); widened to Mediterranean/Middle Eastern with this caveat."
+  },
+  "SEN": {
+    "nation": "Senegal",
+    "b05006": [
+      "B05006_125E"
+    ],
+    "cuisines": [
+      "African"
+    ],
+    "notes": "DOHMH has no nation-level African tags; 'African' is one bucket. Co-location to Senegalese enclaves (Harlem, Bronx) is essential to make this meaningful."
+  },
+  "EGY": {
+    "nation": "Egypt",
+    "b05006": [
+      "B05006_112E"
+    ],
+    "cuisines": [
+      "Egyptian",
+      "Middle Eastern"
+    ],
+    "notes": "Co-location to Astoria/Steinway sharpens this."
+  },
+  "ALG": {
+    "nation": "Algeria",
+    "b05006": [
+      "B05006_111E"
+    ],
+    "cuisines": [
+      "African",
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "notes": "No 'Algerian' tag; broad buckets."
+  },
+  "TUN": {
+    "nation": "Tunisia",
+    "b05006": [],
+    "cuisines": [
+      "African",
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "notes": "ACS folds Tunisia into 'Other Northern Africa'; no diaspora layer, flagged limited."
+  },
+  "NGA": {
+    "nation": "Nigeria",
+    "b05006": [
+      "B05006_124E"
+    ],
+    "cuisines": [
+      "African"
+    ],
+    "notes": "African bucket; co-location to Nigerian enclaves (Bronx) sharpens it."
+  },
+  "CIV": {
+    "nation": "Ivory Coast",
+    "b05006": [
+      "B05006_122E"
+    ],
+    "cuisines": [
+      "African"
+    ],
+    "notes": "African bucket."
+  },
+  "CMR": {
+    "nation": "Cameroon",
+    "b05006": [
+      "B05006_106E"
+    ],
+    "cuisines": [
+      "African"
+    ],
+    "notes": "African bucket."
+  },
+  "GHA": {
+    "nation": "Ghana",
+    "b05006": [
+      "B05006_121E"
+    ],
+    "cuisines": [
+      "African"
+    ],
+    "notes": "African bucket; co-location to Ghanaian enclaves (Bronx) sharpens it."
+  },
+  "RSA": {
+    "nation": "South Africa",
+    "b05006": [
+      "B05006_117E"
+    ],
+    "cuisines": [
+      "African"
+    ],
+    "notes": "African bucket, weak."
+  },
+  "MLI": {
+    "nation": "Mali",
+    "b05006": [],
+    "cuisines": [
+      "African"
+    ],
+    "notes": "ACS folds Mali into 'Other Western Africa'; no diaspora layer, flagged limited."
+  },
+  "CPV": {
+    "nation": "Cape Verde",
+    "b05006": [
+      "B05006_120E"
+    ],
+    "cuisines": [
+      "African",
+      "Portuguese"
+    ],
+    "notes": "Cabo Verde. African/Portuguese-overlap bucket."
+  },
+  "NZL": {
+    "nation": "New Zealand",
+    "b05006": [],
+    "cuisines": [
+      "Australian"
+    ],
+    "notes": "ACS folds New Zealand into 'Other Australian and New Zealand Subregion'; no diaspora layer, flagged limited."
+  }
+}

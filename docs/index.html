@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where to watch the World Cup in New York City</title>
+<meta name="description" content="Pick a 2026 World Cup team and see which New York City neighborhoods are densest with that nation's residents — and the restaurants and bars of that cuisine there to watch the match.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://use.typekit.net/qqk2vto.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+@font-face {
+  font-family: 'GascogneTS';
+  src: url('https://vital-city-nyc.github.io/vital-city-design-system/fonts/GascogneTS-Light.ttf') format('truetype');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+
+/* All styles scoped under .wc-root so this embeds into Ghost or any page without leaking. */
+.wc-root {
+  --wc-black: #050507;
+  --wc-white: #ffffff;
+  --wc-cloud: #dddddd;
+  --wc-paper: #f7f6f1;
+  --wc-charcoal: #707175;
+  --wc-orange: #ff7c53;
+  --wc-magenta: #e7466d;
+  --wc-cerulean: #217ebe;
+  --wc-indigo: #394882;
+  --wc-chartreuse: #dde44c;
+  --wc-pitch: #2f7d4f;
+
+  /* sequential density ramp — cream -> orange -> magenta -> deep (intensity, not "bad") */
+  --wc-d0: #efe9da;
+  --wc-d1: #f7d9a8;
+  --wc-d2: #f6a96b;
+  --wc-d3: #ef7c53;
+  --wc-d4: #d8456a;
+  --wc-d5: #7a2150;
+
+  --wc-font-sans: "halyard-text", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --wc-font-serif: "GascogneTS", "Source Serif 4", Georgia, serif;
+
+  font-family: var(--wc-font-sans);
+  color: var(--wc-black);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.wc-root *, .wc-root *::before, .wc-root *::after { box-sizing: border-box; }
+
+.wc-fullscreen { position: fixed; inset: 0; background: var(--wc-paper); }
+.wc-root #wc-map { position: absolute; inset: 0; z-index: 1; background: var(--wc-paper); }
+.wc-root .leaflet-interactive { transition: fill 0.45s ease, fill-opacity 0.45s ease; }
+
+/* ------- Panel ------- */
+.wc-panel {
+  position: absolute; top: 18px; left: 18px; width: 360px;
+  max-height: calc(100% - 36px);
+  background: var(--wc-white); border: 1px solid var(--wc-black);
+  z-index: 1000; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;
+}
+.wc-panel::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.wc-panel-header { padding: 18px 20px 17px; border-bottom: 1px solid var(--wc-black); position: relative; }
+.wc-panel-body { padding: 20px 20px 20px; }
+
+/* kickoff-circle motif straddling the header line — a quiet pitch nod */
+.wc-kickoff { position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); width: 18px; height: 18px; border: 1.5px solid var(--wc-black); border-radius: 50%; background: var(--wc-white); z-index: 3; }
+.wc-kickoff::after { content: ''; position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; background: var(--wc-black); border-radius: 50%; transform: translate(-50%, -50%); }
+
+.wc-kicker { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--wc-orange); margin-bottom: 9px; display: flex; align-items: center; gap: 7px; }
+.wc-pitch-ico { flex: none; }
+.wc-title { font-weight: 800; font-size: 23px; line-height: 1.14; margin: 0 0 8px; letter-spacing: -0.012em; }
+.wc-deck { font-size: 12.5px; font-weight: 300; line-height: 1.5; margin: 0; }
+.wc-deck strong { font-weight: 700; }
+
+.wc-team-wrap { padding: 14px 20px; border-bottom: 1px solid var(--wc-black); background: var(--wc-paper); }
+.wc-team-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--wc-charcoal); margin-bottom: 7px; }
+.wc-team-row { display: flex; align-items: center; gap: 10px; }
+.wc-flag { font-size: 30px; line-height: 1; }
+.wc-select {
+  width: 100%; padding: 9px 28px 9px 11px; background: var(--wc-white);
+  border: 1px solid var(--wc-black); font-family: var(--wc-font-sans);
+  font-size: 13.5px; font-weight: 600; color: var(--wc-black); cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='%23050507'/></svg>");
+  background-repeat: no-repeat; background-position: right 10px center; outline: none;
+}
+.wc-select:focus { border-color: var(--wc-orange); }
+
+.wc-stats { display: grid; grid-template-columns: 1fr 1fr; background: var(--wc-paper); border-bottom: 1px solid var(--wc-black); }
+.wc-stat { padding: 12px 16px 14px; border-right: 1px solid var(--wc-cloud); border-top: 1px solid var(--wc-cloud); }
+.wc-stat:nth-child(odd) { border-right: 1px solid var(--wc-cloud); }
+.wc-stat:nth-child(even) { border-right: 0; }
+.wc-stat:nth-child(-n+2) { border-top: 0; }
+.wc-stat-value { display: block; font-family: var(--wc-font-serif); font-weight: 300; font-size: 29px; line-height: 1; margin-bottom: 6px; }
+.wc-stat-value small { font-size: 15px; }
+.wc-stat-label { display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--wc-charcoal); line-height: 1.3; }
+
+.wc-section { margin-bottom: 15px; }
+.wc-section-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--wc-charcoal); margin-bottom: 7px; }
+
+.wc-segctl { display: flex; border: 1px solid var(--wc-black); }
+.wc-segctl button { flex: 1; padding: 7px 4px; background: var(--wc-white); border: 0; border-right: 1px solid var(--wc-cloud); font-family: var(--wc-font-sans); font-size: 11px; font-weight: 600; color: var(--wc-black); cursor: pointer; }
+.wc-segctl button:last-child { border-right: 0; }
+.wc-segctl button.is-active { background: var(--wc-black); color: var(--wc-white); }
+.wc-segctl button:hover:not(.is-active) { background: var(--wc-paper); }
+
+.wc-note { font-size: 11px; line-height: 1.45; color: var(--wc-black); background: #fbf3ee; border-left: 3px solid var(--wc-orange); padding: 8px 10px; margin-bottom: 14px; }
+.wc-note b { font-weight: 700; }
+
+.wc-legend { margin: 4px 0 14px; }
+.wc-legend-title { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--wc-charcoal); margin-bottom: 6px; font-weight: 700; }
+.wc-legend-bar { height: 10px; border: 1px solid var(--wc-black); background: linear-gradient(to right, var(--wc-d0), var(--wc-d1), var(--wc-d2), var(--wc-d3), var(--wc-d4), var(--wc-d5)); }
+.wc-legend-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--wc-charcoal); margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.wc-toplist-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; display: inline-block; border-bottom: 2px solid var(--wc-pitch); padding-bottom: 3px; }
+.wc-toplist-sub { font-size: 10.5px; color: var(--wc-charcoal); margin-bottom: 8px; line-height: 1.4; }
+.wc-venue { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--wc-cloud); cursor: pointer; }
+.wc-venue:hover { background: var(--wc-paper); }
+.wc-venue-rank { font-family: var(--wc-font-serif); font-weight: 300; font-size: 18px; color: var(--wc-pitch); line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+.wc-venue-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wc-venue-meta { font-size: 10.5px; color: var(--wc-charcoal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.wc-empty { font-size: 12px; color: var(--wc-charcoal); padding: 10px 0; line-height: 1.5; }
+
+.wc-footer-meta { margin-top: 16px; font-size: 10.5px; color: var(--wc-charcoal); line-height: 1.5; }
+.wc-footer-meta a { color: var(--wc-black); }
+.wc-footer-meta details summary { cursor: pointer; color: var(--wc-black); font-weight: 600; }
+.wc-rule { height: 1px; background: var(--wc-cloud); border: 0; margin: 14px 0; }
+
+/* Loading overlay — a ball rolling through a pitch's center circle */
+.wc-loading { position: absolute; inset: 0; background: rgba(247,246,241,0.96); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; transition: opacity 0.4s; }
+.wc-loading.is-hidden { opacity: 0; pointer-events: none; }
+.wc-pitch-loader { position: relative; width: 240px; height: 34px; }
+.wc-pitch-loader .pl-line { position: absolute; top: 50%; left: 0; right: 0; height: 1.5px; background: var(--wc-cloud); }
+.wc-pitch-loader .pl-ring { position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border: 1.5px solid var(--wc-cloud); border-radius: 50%; }
+.wc-pitch-loader .pl-ball { position: absolute; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; background: var(--wc-orange); box-shadow: 0 1px 2px rgba(0,0,0,0.25); animation: wc-roll 1.7s cubic-bezier(.45,.05,.55,.95) infinite; }
+@keyframes wc-roll { 0% { left: -6px; } 50% { left: calc(100% - 6px); } 100% { left: -6px; } }
+.wc-loading-text { margin-top: 16px; font-size: 12px; color: var(--wc-charcoal); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; }
+
+/* Tooltip (PUMA hover) */
+.wc-tooltip { position: absolute; pointer-events: none; z-index: 1500; background: var(--wc-black); color: var(--wc-white); padding: 9px 11px; font-size: 11.5px; line-height: 1.4; max-width: 240px; display: none; }
+.wc-tooltip .tt-name { font-weight: 700; font-size: 12.5px; margin-bottom: 3px; }
+.wc-tooltip .tt-big { font-family: var(--wc-font-serif); font-weight: 300; font-size: 22px; line-height: 1; }
+.wc-tooltip .tt-sub { color: #c9c9cf; font-size: 10.5px; margin-top: 3px; }
+.wc-tooltip .tt-reliab { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.tt-reliab.high { background: var(--wc-chartreuse); }
+.tt-reliab.moderate { background: var(--wc-orange); }
+.tt-reliab.low { background: var(--wc-magenta); }
+
+/* Leaflet popup overrides */
+.wc-root .leaflet-popup-content-wrapper { background: var(--wc-white); color: var(--wc-black); border: 1px solid var(--wc-black); border-radius: 0; box-shadow: none; }
+.wc-root .leaflet-popup-content { font-family: var(--wc-font-sans); font-size: 12.5px; margin: 13px 15px; line-height: 1.45; }
+.wc-root .leaflet-popup-tip { background: var(--wc-white); border: 1px solid var(--wc-black); box-shadow: none; }
+.wc-root .leaflet-popup-close-button { color: var(--wc-charcoal) !important; padding: 6px 8px 0 0 !important; }
+.wc-pop-kicker { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--wc-orange); margin-bottom: 4px; }
+.wc-pop-name { font-weight: 800; font-size: 15px; line-height: 1.2; margin-bottom: 3px; }
+.wc-pop-meta { font-size: 11px; color: var(--wc-charcoal); margin-bottom: 8px; }
+.wc-pop-rating { font-family: var(--wc-font-serif); font-weight: 300; font-size: 32px; line-height: 1; color: var(--wc-magenta); }
+.wc-pop-rating small { font-size: 13px; color: var(--wc-charcoal); }
+.wc-pop-price { font-size: 13px; font-weight: 700; color: var(--wc-cerulean); margin-left: 10px; }
+
+/* Embed + fullscreen */
+.wc-fs-btn { position: absolute; top: 12px; right: 12px; z-index: 1100; background: var(--wc-black); color: var(--wc-white); border: 1px solid var(--wc-black); font-family: var(--wc-font-sans); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 7px 11px; cursor: pointer; display: none; }
+.wc-fs-btn:hover { background: var(--wc-orange); border-color: var(--wc-orange); }
+.wc-root.is-embed .wc-fs-btn, .wc-root.is-fs .wc-fs-btn { display: inline-block; }
+.wc-root.is-embed { position: relative; inset: auto; height: 680px; width: 100%; background: var(--wc-paper); border: 1px solid var(--wc-black); }
+
+@media (max-width: 720px) {
+  .wc-panel { top: auto; bottom: 0; left: 0; right: 0; width: 100%; max-height: 58%; border-left: 0; border-right: 0; border-bottom: 0; }
+  .wc-title { font-size: 19px; }
+  .wc-root.is-embed { height: 600px; }
+}
+</style>
+</head>
+<body style="margin:0;padding:0;background:#f7f6f1;">
+
+<div class="wc-root wc-fullscreen" id="wc-mount">
+  <div id="wc-map"></div>
+  <button class="wc-fs-btn" id="wc-fs-btn" type="button">Full screen ↗</button>
+  <div class="wc-tooltip" id="wc-tooltip"></div>
+
+  <div class="wc-panel">
+    <div class="wc-panel-header">
+      <div class="wc-kicker">
+        <svg class="wc-pitch-ico" width="20" height="13" viewBox="0 0 20 13" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true">
+          <rect x="0.6" y="0.6" width="18.8" height="11.8" rx="0.6"/>
+          <line x1="10" y1="0.6" x2="10" y2="12.4"/>
+          <circle cx="10" cy="6.5" r="2.4"/>
+          <rect x="0.6" y="3.6" width="3.2" height="5.8"/>
+          <rect x="16.2" y="3.6" width="3.2" height="5.8"/>
+        </svg>
+        World Cup 2026 · New York City
+      </div>
+      <h1 class="wc-title">Where to watch your team</h1>
+      <p class="wc-deck">Pick a national team. The map shades the New York City neighborhoods densest with people born in that country, and pins restaurants and bars of that cuisine right where the community lives.</p>
+      <div class="wc-kickoff"></div>
+    </div>
+
+    <div class="wc-team-wrap">
+      <div class="wc-team-label">Choose a team</div>
+      <div class="wc-team-row">
+        <span class="wc-flag" id="wc-flag">🏳️</span>
+        <select class="wc-select" id="wc-team"></select>
+      </div>
+    </div>
+
+    <div class="wc-stats" id="wc-stats">
+      <div class="wc-stat"><span class="wc-stat-value" id="wc-stat-people">—</span><span class="wc-stat-label" id="wc-stat-people-lbl">NYC residents born there</span></div>
+      <div class="wc-stat"><span class="wc-stat-value" id="wc-stat-hood" style="font-size:15px;line-height:1.15;">—</span><span class="wc-stat-label">Densest neighborhood</span></div>
+      <div class="wc-stat"><span class="wc-stat-value" id="wc-stat-venues">—</span><span class="wc-stat-label">Spots in those neighborhoods</span></div>
+      <div class="wc-stat"><span class="wc-stat-value" id="wc-stat-cuisine" style="font-size:15px;line-height:1.15;">—</span><span class="wc-stat-label">Cuisine on the map</span></div>
+    </div>
+
+    <div class="wc-panel-body">
+      <div class="wc-note" id="wc-note" style="display:none;"></div>
+
+      <div class="wc-section">
+        <div class="wc-section-label">Shade neighborhoods by</div>
+        <div class="wc-segctl" id="wc-metric-ctl">
+          <button data-metric="count" class="is-active">Number of residents</button>
+          <button data-metric="share">Share of foreign-born</button>
+        </div>
+      </div>
+
+      <div class="wc-legend">
+        <div class="wc-legend-title" id="wc-legend-title">Residents born in this country</div>
+        <div class="wc-legend-bar"></div>
+        <div class="wc-legend-labels" id="wc-legend-labels"><span>fewer</span><span>more</span></div>
+      </div>
+
+      <div class="wc-toplist">
+        <div class="wc-toplist-title" id="wc-toplist-title">Where to watch</div>
+        <div class="wc-toplist-sub" id="wc-toplist-sub">Spots of this cuisine in the densest neighborhoods. Click a row to fly there.</div>
+        <div id="wc-toplist"></div>
+      </div>
+
+      <div class="wc-footer-meta">
+        <hr class="wc-rule">
+        <details>
+          <summary>How this works &amp; caveats</summary>
+          <p style="margin:6px 0 8px;">Neighborhood shading: U.S. Census ACS table B05006 (place of birth for the foreign-born) at the PUMA level — the 55 named NYC neighborhoods the Census reports country-of-birth for. Spots: NYC DOHMH restaurant inspections (cuisine + location). Spots are not quality-ranked — no free, terms-compliant source lets us re-host restaurant ratings.</p>
+          <p style="margin:6px 0 8px;"><strong>This is a heuristic, not a screening guide.</strong> It shows where a nation's New Yorkers live and where that cuisine clusters — not which bars actually show the match. Cuisine tags are broad; place of birth isn't ancestry.</p>
+          <p style="margin:6px 0;"><a href="methodology.md" target="_blank" rel="noopener">Full methodology →</a></p>
+        </details>
+        <p style="margin-top:10px;" id="wc-refresh">Data: U.S. Census ACS, NYC DOHMH, NYC City Planning.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wc-loading" id="wc-loading">
+    <div class="wc-pitch-loader"><div class="pl-line"></div><div class="pl-ring"></div><div class="pl-ball"></div></div>
+    <div class="wc-loading-text">Kicking off…</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const ROOT = document.getElementById('wc-mount');
+  const $ = (id) => document.getElementById(id);
+
+  const IS_EMBED = new URLSearchParams(location.search).get('embed') === '1';
+  if (IS_EMBED) { ROOT.classList.remove('wc-fullscreen'); ROOT.classList.add('is-embed'); document.body.style.background = '#ffffff'; }
+
+  const DENSITY = ['#efe9da', '#f7d9a8', '#f6a96b', '#ef7c53', '#d8456a', '#7a2150'];
+  const CONF_ORDER = ['CONCACAF', 'CONMEBOL', 'UEFA', 'CAF', 'AFC', 'OFC', 'Playoff'];
+  const DEFAULT_TEAM = 'MEX';
+
+  const STATE = {
+    map: null, pumaLayer: null, venueLayer: null,
+    pumaFeatures: null, manifest: null,
+    team: null, metric: 'count', filter: 'all',
+    pumaById: {},
+  };
+
+  async function loadJSON(path) {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
+    return res.json();
+  }
+
+  // ---- color scale (quantile over positive values of current team/metric) ----
+  function valueFor(geoid) {
+    const c = STATE.team && STATE.team.choropleth[geoid];
+    if (!c) return 0;
+    if (STATE.metric === 'share') return c.share_fb || 0;
+    return c.count || 0;
+  }
+  function buildBreaks() {
+    const vals = [];
+    if (STATE.team) for (const g in STATE.team.choropleth) {
+      const v = STATE.metric === 'share' ? (STATE.team.choropleth[g].share_fb || 0) : STATE.team.choropleth[g].count;
+      if (v > 0) vals.push(v);
+    }
+    vals.sort((a, b) => a - b);
+    STATE._vals = vals;
+    const q = (p) => vals.length ? vals[Math.min(vals.length - 1, Math.floor(p * vals.length))] : 0;
+    STATE.breaks = [q(0.5), q(0.7), q(0.84), q(0.93), q(0.98)];
+  }
+  function colorFor(geoid) {
+    const v = valueFor(geoid);
+    if (v <= 0) return '#ecebe4';
+    const b = STATE.breaks;
+    let i = 0; while (i < b.length && v > b[i]) i++;
+    return DENSITY[i];
+  }
+
+  function styleFn(feature) {
+    const geoid = feature.properties.geoid;
+    const isTop = STATE.team && STATE.team.top_pumas.includes(geoid);
+    return {
+      fillColor: colorFor(geoid),
+      fillOpacity: valueFor(geoid) > 0 ? 0.82 : 0.35,
+      color: isTop ? '#050507' : '#9a978c',
+      weight: isTop ? 2.4 : 0.5,
+      opacity: isTop ? 1 : 0.5,
+    };
+  }
+
+  // ---- rendering ----
+  function renderChoropleth() {
+    buildBreaks();
+    if (STATE.pumaLayer) STATE.pumaLayer.setStyle(styleFn);
+    updateLegend();
+  }
+
+  function updateLegend() {
+    const t = $('wc-legend-title');
+    t.textContent = STATE.metric === 'share' ? 'Share of the neighborhood’s foreign-born' : `Residents born in ${STATE.team ? STATE.team.nation : 'this country'}`;
+    const labels = $('wc-legend-labels');
+    const vals = STATE._vals || [];
+    if (!vals.length) { labels.innerHTML = '<span>no data</span><span></span>'; return; }
+    const lo = vals[0], hi = vals[vals.length - 1];
+    const fmt = STATE.metric === 'share' ? (v) => Math.round(v * 100) + '%' : (v) => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v;
+    labels.innerHTML = `<span>${fmt(lo)}</span><span>${fmt(hi)}</span>`;
+  }
+
+  const LIST_MAX = 16;
+
+  function renderVenues() {
+    if (STATE.venueLayer) STATE.map.removeLayer(STATE.venueLayer);
+    const layer = L.layerGroup();
+    const vs = STATE.team ? STATE.team.venues : [];
+    for (const v of vs) {
+      const m = L.circleMarker([v.lat, v.lon], {
+        radius: 5,
+        fillColor: '#e7466d', fillOpacity: 0.82,
+        color: '#050507', weight: 0.6, opacity: 0.7,
+      });
+      m.bindPopup(`
+        <div>
+          <div class="wc-pop-kicker">${v.cuisine} · ${v.puma_name}</div>
+          <div class="wc-pop-name">${v.name}</div>
+          <div class="wc-pop-meta">${v.boro}</div>
+        </div>`, { maxWidth: 280 });
+      layer.addLayer(m);
+    }
+    STATE.venueLayer = layer;
+    layer.addTo(STATE.map);
+    renderList(vs);
+  }
+
+  function renderList(vs) {
+    const el = $('wc-toplist');
+    const sub = $('wc-toplist-sub');
+    if (STATE.team && STATE.team.host) {
+      el.innerHTML = `<div class="wc-empty"><b>${STATE.team.nation} is a host nation.</b> The home crowd is everywhere — every neighborhood is fair game. We don’t single out spots for the host teams.</div>`;
+      sub.textContent = ''; return;
+    }
+    if (!vs.length) {
+      const msg = STATE.team && STATE.team.data_quality === 'limited'
+        ? 'NYC community and cuisine data for this nation is limited, so there are no spots to highlight.'
+        : 'No restaurants of this cuisine cluster in this nation’s densest NYC neighborhoods.';
+      el.innerHTML = `<div class="wc-empty">${msg}</div>`;
+      sub.textContent = ''; return;
+    }
+    sub.textContent = vs.length > LIST_MAX
+      ? `Showing ${LIST_MAX} of ${vs.length.toLocaleString()} ${STATE.team.cuisines[0] || ''} spots in these neighborhoods. Click a row to fly there.`
+      : 'Spots of this cuisine in the densest neighborhoods. Click a row to fly there.';
+    el.innerHTML = vs.slice(0, LIST_MAX).map((v, i) => `
+      <div class="wc-venue" data-lat="${v.lat}" data-lon="${v.lon}">
+        <span class="wc-venue-rank">${i + 1}</span>
+        <span>
+          <span class="wc-venue-name">${v.name}</span><br>
+          <span class="wc-venue-meta">${v.cuisine} · ${v.puma_name}</span>
+        </span>
+      </div>`).join('');
+    el.querySelectorAll('.wc-venue').forEach(n => n.addEventListener('click', () => {
+      STATE.map.flyTo([parseFloat(n.dataset.lat), parseFloat(n.dataset.lon)], 15, { duration: 0.7 });
+    }));
+  }
+
+  function updateStats() {
+    const t = STATE.team; if (!t) return;
+    $('wc-flag').textContent = t.flag || '🏳️';
+    const peopleEl = $('wc-stat-people');
+    if (t.host && !t.nyc_total) { peopleEl.innerHTML = '<small>Host</small>'; }
+    else peopleEl.textContent = t.nyc_total ? t.nyc_total.toLocaleString() : '—';
+    $('wc-stat-hood').textContent = t.stats.top_neighborhood || '—';
+    $('wc-stat-venues').textContent = t.host ? '—' : (t.stats.n_venues || 0).toLocaleString();
+    const cuisineEl = $('wc-stat-cuisine');
+    if (t.cuisines && t.cuisines.length) {
+      cuisineEl.textContent = t.cuisines[0] + (t.cuisines.length > 1 ? ` +${t.cuisines.length - 1}` : '');
+    } else cuisineEl.textContent = '—';
+
+    const note = $('wc-note');
+    const bits = [];
+    if (t.data_quality === 'limited') bits.push('<b>Limited data.</b> The Census doesn’t break out this nation’s residents and/or NYC has few of this cuisine, so the map may be sparse.');
+    else if (t.host) bits.push('<b>Host nation.</b> No diaspora shading — this is home turf.');
+    if (t.notes) bits.push(t.notes);
+    if (bits.length) { note.innerHTML = bits.join(' '); note.style.display = ''; }
+    else note.style.display = 'none';
+  }
+
+  async function selectTeam(code) {
+    try {
+      STATE.team = await loadJSON(`data/teams/${code}.json`);
+    } catch (e) { console.error(e); return; }
+    updateStats();
+    renderChoropleth();
+    renderVenues();
+  }
+
+  // ---- tooltip on PUMA hover ----
+  function bindPumaInteractions(layer) {
+    const tip = $('wc-tooltip');
+    layer.eachLayer(l => {
+      l.on('mousemove', (e) => {
+        const p = l.feature.properties;
+        const c = STATE.team && STATE.team.choropleth[p.geoid];
+        const rank = c && STATE.team ? (STATE.team.top_pumas.indexOf(p.geoid)) : -1;
+        let body;
+        if (c) {
+          const reliab = c.reliab || 'low';
+          body = `<div class="tt-name">${p.name}</div>
+            <div class="tt-big">${(c.count || 0).toLocaleString()}</div>
+            <div class="tt-sub">born in ${STATE.team.nation}${c.share_fb != null ? ` · ${Math.round(c.share_fb * 100)}% of the area’s foreign-born` : ''}</div>
+            <div class="tt-sub"><span class="tt-reliab ${reliab}"></span>${reliab} reliability${rank > -1 ? ` · #${rank + 1} neighborhood` : ''}</div>`;
+        } else {
+          body = `<div class="tt-name">${p.name}</div><div class="tt-sub">No recorded residents born in ${STATE.team ? STATE.team.nation : 'this country'}</div>`;
+        }
+        tip.innerHTML = body;
+        tip.style.display = 'block';
+        const rect = ROOT.getBoundingClientRect();
+        tip.style.left = (e.originalEvent.clientX - rect.left + 14) + 'px';
+        tip.style.top = (e.originalEvent.clientY - rect.top + 14) + 'px';
+      });
+      l.on('mouseout', () => { tip.style.display = 'none'; });
+    });
+  }
+
+  // ---- team selector ----
+  function populateSelector() {
+    const sel = $('wc-team');
+    const byConf = {};
+    for (const t of STATE.manifest.teams) (byConf[t.confederation] = byConf[t.confederation] || []).push(t);
+    for (const conf of CONF_ORDER) {
+      const list = byConf[conf]; if (!list) continue;
+      const og = document.createElement('optgroup');
+      og.label = conf === 'Playoff' ? 'Playoff (to be decided)' : conf;
+      list.sort((a, b) => (a.nation || 'zzz').localeCompare(b.nation || 'zzz'));
+      for (const t of list) {
+        const o = document.createElement('option');
+        o.value = t.code;
+        o.textContent = `${t.flag || ''}  ${t.nation || 'Qualifier TBD'}${t.data_quality === 'limited' ? ' (limited data)' : ''}${t.data_quality === 'tbd' ? '' : ''}`;
+        if (!t.qualified) o.disabled = true;
+        og.appendChild(o);
+      }
+      sel.appendChild(og);
+    }
+    sel.value = DEFAULT_TEAM;
+    sel.addEventListener('change', () => selectTeam(sel.value));
+  }
+
+  // ---- embed height sync ----
+  let lastH = 0;
+  function postHeight() {
+    const h = Math.max(document.body.scrollHeight, ROOT.scrollHeight);
+    if (h && h !== lastH) { lastH = h; try { parent.postMessage({ type: 'wc-embed-height', height: h }, '*'); } catch (e) {} }
+  }
+
+  async function init() {
+    STATE.map = L.map('wc-map', { center: [40.71, -73.92], zoom: 11, minZoom: 9, maxZoom: 18, zoomControl: false, preferCanvas: true });
+    L.control.zoom({ position: 'topright' }).addTo(STATE.map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Census ACS · NYC DOHMH',
+      subdomains: 'abcd', maxZoom: 19,
+    }).addTo(STATE.map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19, pane: 'shadowPane' }).addTo(STATE.map);
+
+    const [manifest, pumas] = await Promise.all([loadJSON('data/manifest.json'), loadJSON('data/pumas.geojson')]);
+    STATE.manifest = manifest;
+    STATE.pumaFeatures = pumas;
+
+    STATE.pumaLayer = L.geoJSON(pumas, { style: styleFn }).addTo(STATE.map);
+    bindPumaInteractions(STATE.pumaLayer);
+
+    populateSelector();
+
+    document.querySelectorAll('#wc-metric-ctl button').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll('#wc-metric-ctl button').forEach(x => x.classList.toggle('is-active', x === b));
+      STATE.metric = b.dataset.metric; renderChoropleth();
+    }));
+
+    if (manifest.generated_at) {
+      const d = new Date(manifest.generated_at);
+      $('wc-refresh').textContent = `Data built ${d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} · Census ACS, NYC DOHMH, NYC City Planning.`;
+    }
+
+    await selectTeam(DEFAULT_TEAM);
+    $('wc-loading').classList.add('is-hidden');
+
+    window.addEventListener('resize', postHeight);
+    if (window.ResizeObserver) new ResizeObserver(postHeight).observe(ROOT);
+    setTimeout(postHeight, 300);
+  }
+
+  // fullscreen toggle
+  const fsBtn = $('wc-fs-btn');
+  function isFs() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function setLbl() { fsBtn.textContent = isFs() ? 'Close ✕' : 'Full screen ↗'; }
+  fsBtn.addEventListener('click', () => {
+    if (isFs()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else { const r = ROOT.requestFullscreen || ROOT.webkitRequestFullscreen; if (r) r.call(ROOT); }
+  });
+  document.addEventListener('fullscreenchange', () => { ROOT.classList.toggle('is-fs', isFs()); setLbl(); if (STATE.map) setTimeout(() => STATE.map.invalidateSize(), 60); });
+  setLbl();
+
+  init().catch(err => { console.error(err); $('wc-loading').innerHTML = `<div class="wc-loading-text" style="color:#d2232a;">Failed to load — ${err.message}</div>`; });
+})();
+</script>
+</body>
+</html>
